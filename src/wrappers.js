@@ -47,7 +47,7 @@ function getHandler (method, mostly) {
     mostly.act({
       topic: `poplar.${service}`,
       cmd: method,
-      path: path,
+      path: `/${path}`,
       headers: req.headers || {},
       query: req.query || {},
       params: req.params || {},
