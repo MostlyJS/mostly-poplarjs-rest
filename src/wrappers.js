@@ -50,7 +50,6 @@ function getHandler (method, mostly) {
       path: `/${path}`,
       headers: req.headers || {},
       query: req.query || {},
-      params: req.params || {},
       body: req.body || {}
     }, callback);
   };
