@@ -24,7 +24,8 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.23.0",
-    "debug": "^2.6.6"
+    "debug": "^2.6.6",
+    "validator": "^9.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",

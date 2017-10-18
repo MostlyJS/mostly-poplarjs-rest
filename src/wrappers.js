@@ -1,4 +1,5 @@
 import makeDebug from 'debug';
+import validator from 'validator';
 
 const debug = makeDebug('mostly:poplarjs:rest:wrappers');
 
@@ -17,17 +18,32 @@ const allowedMethods = {
 };
 
 // A function that returns the middleware for a given method
-function getHandler (method, mostly) {
+function getHandler (method, trans) {
   return function (req, res, next) {
     res.setHeader('Allow', Object.values(allowedMethods).join(','));
 
-    let path = req.params[0] || '';
-    let paths = path.split('/');
-    let service = paths.length > 1? `${paths[0]}.${paths[1]}` : paths[0]; // TODO
+    let service = req.params.__service;
+    let id = req.params.__id;
+    let action = req.params.__action;
+    let path = '/' + service +
+      (id? '/' + id : '') +
+      (action? '/' + action : '');
+    
+    // guess whether id is an action?
+    if (id && !action) {
+      if (!(validator.isNumeric(id) || validator.isMongoId(id))) {
+        action = id;
+      }
+    }
+    service += (action? '.' + action : '');
+    
+    debug(`REST handler calling service \'${service}\'`);
+    debug(` => cmd  \'${method}\'`);
+    debug(` => path \'${path}\'`);
 
     // The service success callback which sets res.data or calls next() with the error
     const callback = function (err, data) {
-      debug(' ==> service response:', err, data);
+      debug(' => service response:', err, data);
       if (err) return next(err.cause || err);
 
       res.data = data;
@@ -42,18 +58,17 @@ function getHandler (method, mostly) {
       return next();
     };
 
-    debug(`REST handler calling service \`${service}\`, cmd \`${method}\`, with \`${path}\``);
-
-    mostly.act({
+    trans.act({
       topic: `poplar.${service}`,
       cmd: method,
-      path: `/${path}`,
+      path: path,
       headers: req.headers || {},
       query: req.query || {},
       body: req.body || {}
     }, callback);
   };
 }
+
 
 // Returns wrapped middleware for a service method.
 export default {
