@@ -7,7 +7,6 @@ function formatter(req, res, next) {
   if (res.data === undefined) {
     return next();
   }
-
   res.format({
     'application/json': function () {
       res.json(res.data);
@@ -15,7 +14,10 @@ function formatter(req, res, next) {
   });
 }
 
-export default function rest(app, trans, path, handler = formatter) {
+export default function rest(app, trans, path, options = {}) {
+  const handler = options.handler || formatter;
+  const version = options.version || '*';
+
   // Register the REST provider
   const uri = path || '';
   const baseRoute = app.route(`${uri}/:__service`);
@@ -24,21 +26,21 @@ export default function rest(app, trans, path, handler = formatter) {
 
   debug(`Adding REST handler for service route \`${uri}\``);
 
-  baseRoute.get(wrappers.get(trans), handler);
-  baseRoute.post(wrappers.post(trans), handler);
-  baseRoute.patch(wrappers.patch(trans), handler);
-  baseRoute.put(wrappers.put(trans), handler);
-  baseRoute.delete(wrappers.delete(trans), handler);
+  baseRoute.get(wrappers.get(trans, version), handler);
+  baseRoute.post(wrappers.post(trans, version), handler);
+  baseRoute.patch(wrappers.patch(trans, version), handler);
+  baseRoute.put(wrappers.put(trans, version), handler);
+  baseRoute.delete(wrappers.delete(trans, version), handler);
 
-  idRoute.get(wrappers.get(trans), handler);
-  idRoute.patch(wrappers.patch(trans), handler);
-  idRoute.put(wrappers.put(trans), handler);
-  idRoute.delete(wrappers.delete(trans), handler);
+  idRoute.get(wrappers.get(trans, version), handler);
+  idRoute.patch(wrappers.patch(trans, version), handler);
+  idRoute.put(wrappers.put(trans, version), handler);
+  idRoute.delete(wrappers.delete(trans, version), handler);
 
-  actionRoute.get(wrappers.get(trans), handler);
-  actionRoute.patch(wrappers.patch(trans), handler);
-  actionRoute.put(wrappers.put(trans), handler);
-  actionRoute.delete(wrappers.delete(trans), handler);
+  actionRoute.get(wrappers.get(trans, version), handler);
+  actionRoute.patch(wrappers.patch(trans, version), handler);
+  actionRoute.put(wrappers.put(trans, version), handler);
+  actionRoute.delete(wrappers.delete(trans, version), handler);
 
   return function (req, res, next) {
     next();

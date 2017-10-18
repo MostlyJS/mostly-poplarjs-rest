@@ -18,7 +18,7 @@ const allowedMethods = {
 };
 
 // A function that returns the middleware for a given method
-function getHandler (method, trans) {
+function getHandler (method, trans, version) {
   return function (req, res, next) {
     res.setHeader('Allow', Object.values(allowedMethods).join(','));
 
@@ -40,6 +40,7 @@ function getHandler (method, trans) {
     debug(`REST handler calling service \'${service}\'`);
     debug(` => cmd  \'${method}\'`);
     debug(` => path \'${path}\'`);
+    debug(` => version \'${version}\'`);
 
     // The service success callback which sets res.data or calls next() with the error
     const callback = function (err, data) {
@@ -62,6 +63,7 @@ function getHandler (method, trans) {
       topic: `poplar.${service}`,
       cmd: method,
       path: path,
+      version: version,
       headers: req.headers || {},
       query: req.query || {},
       body: req.body || {}
