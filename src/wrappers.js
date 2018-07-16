@@ -1,5 +1,5 @@
-import makeDebug from 'debug';
-import validator from 'validator';
+const makeDebug = require('debug');
+const validator = require('validator');
 
 const debug = makeDebug('mostly:poplarjs:rest:wrappers');
 
@@ -73,7 +73,7 @@ function getHandler (method, trans, version) {
 
 
 // Returns wrapped middleware for a service method.
-export default {
+module.exports = {
   get: getHandler.bind(null, 'get'),
   post: getHandler.bind(null, 'post'),
   put: getHandler.bind(null, 'put'),

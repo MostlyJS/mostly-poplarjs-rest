@@ -1,5 +1,5 @@
-import makeDebug from 'debug';
-import wrappers from './wrappers';
+const makeDebug = require('debug');
+const wrappers = require('./wrappers');
 
 const debug = makeDebug('mostly:poplarjs:rest');
 
@@ -14,7 +14,7 @@ function formatter(req, res, next) {
   });
 }
 
-export default function rest(app, trans, path, options = {}) {
+module.exports = function rest(app, trans, path, options = {}) {
   const handler = options.handler || formatter;
   const version = options.version || '*';
 
@@ -45,5 +45,4 @@ export default function rest(app, trans, path, options = {}) {
   return function (req, res, next) {
     next();
   };
-}
-
+};
